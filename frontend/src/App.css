@@ -549,15 +549,62 @@ textarea::placeholder {
     padding: 23px;
   }
 }
-input[type="password"] {
-  display: block !important;
-  width: 100% !important;
-  color: #111827 !important;
-  -webkit-text-fill-color: #111827 !important;
-  background: #ffffff !important;
-  font-size: 18px !important;
-  letter-spacing: 2px !important;
+
+/* FIX: Make all input text visible on mobile and desktop */
+
+input,
+textarea,
+select {
+  color: #20253a !important;
+  -webkit-text-fill-color: #20253a !important;
+  background-color: #ffffff !important;
+  font-family: Inter, "Segoe UI", sans-serif !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
   opacity: 1 !important;
   visibility: visible !important;
-  caret-color: #111827 !important;
+  text-shadow: none !important;
+  filter: none !important;
+  mix-blend-mode: normal !important;
+  caret-color: #6558df !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #85899b !important;
+  -webkit-text-fill-color: #85899b !important;
+  opacity: 1 !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  color: #20253a !important;
+  -webkit-text-fill-color: #20253a !important;
+  background-color: #ffffff !important;
+  outline: none !important;
+  border-color: #8174ef !important;
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.password-wrapper input {
+  padding-right: 75px !important;
+}
+
+.password-wrapper .toggle-password {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  padding: 7px 10px;
+  background: #eeecff;
+  color: #594bd2;
+  z-index: 5;
 }
