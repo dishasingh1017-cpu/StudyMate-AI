@@ -1,0 +1,40 @@
+
+/* Add these styles to the END of your existing App.css. Keep your existing styles. */
+.nav {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.nav.active { font-weight: 700; }
+.planner-page { display: grid; gap: 22px; }
+.planner-intro {
+  display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  padding: 26px; border-radius: 20px; background: #f1efff;
+}
+.planner-intro h2 { margin: 6px 0 10px; }
+.planner-intro p { max-width: 680px; }
+.planner-panel form { display: grid; gap: 10px; }
+.planner-panel textarea { width: 100%; resize: vertical; font: inherit; padding: 12px; border: 1px solid #dedbea; border-radius: 10px; box-sizing: border-box; }
+.planner-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.planner-fields > div { display: grid; gap: 8px; }
+.learning-progress { margin: 12px 0 20px; }
+.learning-day { margin-top: 18px; }
+.learning-day h3 { padding-bottom: 8px; border-bottom: 1px solid #eceaf3; }
+.learning-activity { display: flex; align-items: flex-start; gap: 12px; padding: 14px 0; border-bottom: 1px solid #f0eef5; }
+.learning-activity input { margin-top: 4px; }
+.learning-activity-text { display: grid; gap: 5px; }
+.learning-activity-text span, .learning-activity-text a { font-size: 0.9rem; }
+.activity-done strong { text-decoration: line-through; opacity: 0.65; }
+.planner-disclaimer { font-size: 0.85rem; opacity: 0.75; margin-top: 20px; }
+.coach-placeholder { padding: 32px; }
+.secondary-button { border: 1px solid #d7d2e8; border-radius: 10px; padding: 10px 14px; background: white; cursor: pointer; }
+@media (max-width: 700px) {
+  .planner-intro { align-items: flex-start; padding: 18px; }
+  .planner-fields { grid-template-columns: 1fr; }
+  .coach-banner { flex-wrap: wrap; }
+}
