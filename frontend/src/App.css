@@ -1,8 +1,8 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 :root {
-  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-family: "Inter", "Segoe UI", sans-serif;
   color: #20253a;
   background: #f5f7fb;
   font-synthesis: none;
@@ -16,11 +16,18 @@
   box-sizing: border-box;
 }
 
+html {
+  min-width: 320px;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
   background: #f5f7fb;
+  color: #20253a;
+  font-family: "Inter", "Segoe UI", sans-serif;
 }
 
 button,
@@ -33,6 +40,7 @@ textarea {
 button {
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
+  border: 0;
 }
 
 button:active {
@@ -52,8 +60,6 @@ a {
   display: flex;
   min-height: 100vh;
 }
-
-/* Sidebar */
 
 .sidebar {
   width: 245px;
@@ -98,13 +104,12 @@ a {
   color: #594bd2;
 }
 
-/* Main dashboard */
-
 .main {
   width: 100%;
   max-width: 1500px;
   margin: 0 auto;
   padding: 34px;
+  min-width: 0;
 }
 
 .top {
@@ -140,8 +145,6 @@ p {
   line-height: 1.6;
 }
 
-/* Statistics */
-
 .grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -155,7 +158,7 @@ p {
 }
 
 .grid .card::after {
-  content: '';
+  content: "";
   position: absolute;
   right: -22px;
   bottom: -35px;
@@ -164,6 +167,7 @@ p {
   border-radius: 50%;
   background: #eeecff;
   opacity: 0.75;
+  pointer-events: none;
 }
 
 .stat {
@@ -175,8 +179,6 @@ p {
   font-weight: 800;
 }
 
-/* Cards */
-
 .card {
   margin-bottom: 20px;
   padding: 25px;
@@ -184,13 +186,12 @@ p {
   border-radius: 17px;
   background: #ffffff;
   box-shadow: 0 5px 20px rgba(36, 39, 70, 0.035);
+  min-width: 0;
 }
 
 .card:hover {
   border-color: #e2defe;
 }
-
-/* Forms */
 
 .formrow {
   display: flex;
@@ -212,38 +213,73 @@ p {
   font-weight: 650;
 }
 
-input,
-select,
-textarea {
+/* Consistent input styling and visible typed text */
+.field input:not([type="checkbox"]),
+.field select,
+.field textarea,
+.auth input:not([type="checkbox"]) {
+  display: block;
   width: 100%;
+  min-width: 0;
+  min-height: 48px;
   padding: 12px 13px;
   border: 1px solid #dfe2ed;
   border-radius: 10px;
   outline: none;
   background: #ffffff;
-  color: #292d43;
+  color: #20253a;
+  -webkit-text-fill-color: #20253a;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  opacity: 1;
+  visibility: visible;
+  caret-color: #6558df;
+  color-scheme: light;
   transition: border-color 0.2s, box-shadow 0.2s;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.auth input:focus {
   border-color: #8174ef;
   box-shadow: 0 0 0 3px rgba(101, 88, 223, 0.1);
+  outline: none;
 }
 
-textarea {
+.field input::placeholder,
+.field textarea::placeholder,
+.auth input::placeholder {
+  color: #85899b;
+  -webkit-text-fill-color: #85899b;
+  opacity: 1;
+}
+
+.field textarea {
   resize: vertical;
   line-height: 1.6;
+  min-height: 110px;
 }
 
-input::placeholder,
-textarea::placeholder {
-  color: #a3a6b4;
+input[type="datetime-local"],
+input[type="number"] {
+  color-scheme: light;
+}
+
+/* Checkbox */
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  flex-shrink: 0;
+  accent-color: #6558df;
+  cursor: pointer;
 }
 
 /* Buttons */
-
 .primary {
   padding: 12px 19px;
   border-radius: 10px;
@@ -282,7 +318,6 @@ textarea::placeholder {
 }
 
 /* Task list */
-
 .task {
   display: flex;
   align-items: center;
@@ -295,8 +330,8 @@ textarea::placeholder {
   border-bottom: none;
 }
 
-.task > input[type='checkbox'],
-.video > input[type='checkbox'] {
+.task > input[type="checkbox"],
+.video > input[type="checkbox"] {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
@@ -339,7 +374,6 @@ textarea::placeholder {
 }
 
 /* Planner */
-
 .video {
   display: flex;
   align-items: flex-start;
@@ -354,6 +388,7 @@ textarea::placeholder {
 
 .video > div {
   min-width: 0;
+  flex: 1;
 }
 
 .video a {
@@ -368,8 +403,7 @@ textarea::placeholder {
   text-decoration: underline;
 }
 
-/* Feedback messages */
-
+/* Feedback */
 .error,
 .success {
   margin-bottom: 16px;
@@ -405,7 +439,6 @@ textarea::placeholder {
 }
 
 /* Login and signup */
-
 .auth {
   width: 100%;
   max-width: 450px;
@@ -444,8 +477,33 @@ textarea::placeholder {
   text-decoration: underline;
 }
 
-/* Responsive layout */
+/* Password show/hide */
+.password-wrapper {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
 
+.password-wrapper input {
+  width: 100%;
+  padding-right: 75px;
+}
+
+.password-wrapper .toggle-password {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+  padding: 7px 10px;
+  background: #eeecff;
+  color: #594bd2;
+  z-index: 5;
+  white-space: nowrap;
+}
+
+/* Responsive layout */
 @media (max-width: 900px) {
   .sidebar {
     width: 205px;
@@ -548,81 +606,12 @@ textarea::placeholder {
   .auth .card {
     padding: 23px;
   }
-}
 
-/* FIX: Make all input text visible on mobile and desktop */
-
-input,
-textarea,
-select {
-  color: #20253a !important;
-  -webkit-text-fill-color: #20253a !important;
-  background-color: #ffffff !important;
-  font-family: Inter, "Segoe UI", sans-serif !important;
-  font-size: 16px !important;
-  font-weight: 500 !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  text-shadow: none !important;
-  filter: none !important;
-  mix-blend-mode: normal !important;
-  caret-color: #6558df !important;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #85899b !important;
-  -webkit-text-fill-color: #85899b !important;
-  opacity: 1 !important;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  color: #20253a !important;
-  -webkit-text-fill-color: #20253a !important;
-  background-color: #ffffff !important;
-  outline: none !important;
-  border-color: #8174ef !important;
-}
-
-.password-wrapper {
-  position: relative;
-  display: flex;
-  width: 100%;
-  align-items: center;
-}
-
-.password-wrapper input {
-  padding-right: 75px !important;
-}
-
-.password-wrapper .toggle-password {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: auto;
-  padding: 7px 10px;
-  background: #eeecff;
-  color: #594bd2;
-  z-index: 5;
-}
-/* Fix Task Title and Subject text visibility */
-input:not([type="password"]),
-textarea,
-select {
-  color: #20253a !important;
-  -webkit-text-fill-color: #20253a !important;
-  background-color: #ffffff !important;
-  caret-color: #20253a !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-input:not([type="password"])::placeholder,
-textarea::placeholder {
-  color: #999999 !important;
-  -webkit-text-fill-color: #999999 !important;
-  opacity: 1 !important;
+  .field input:not([type="checkbox"]),
+  .field select,
+  .field textarea,
+  .auth input:not([type="checkbox"]) {
+    font-size: 16px;
+    min-height: 48px;
+  }
 }

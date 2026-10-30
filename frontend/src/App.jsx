@@ -1,102 +1,8 @@
 
 import { useEffect, useMemo, useState } from "react";
+import "./App.css";
 
 const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
-
-const styles = `
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f5f7fb;color:#20253a}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;border:0;border-radius:10px;padding:11px 15px;font-weight:600}
-.app{min-height:100vh;display:flex}
-.sidebar{width:235px;background:#fff;border-right:1px solid #e8eaf1;padding:25px 16px;flex-shrink:0}
-.brand{font-size:22px;font-weight:800;color:#6558df;margin:0 8px 35px}
-.nav{display:flex;flex-direction:column;gap:8px}
-.nav button{text-align:left;background:transparent;color:#62677a}
-.nav button.active,.nav button:hover{background:#eeecff;color:#594bd2}
-.main{padding:30px;width:100%;max-width:1250px;margin:auto}
-.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:25px}
-h1{font-size:27px;margin:0 0 7px}
-h2{font-size:19px;margin:0 0 16px}
-.muted{color:#777d91;font-size:14px}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:22px}
-.card{background:#fff;border:1px solid #e9ebf2;border-radius:17px;padding:21px;box-shadow:0 4px 16px #20253a05;margin-bottom:18px}
-.stat{font-size:29px;font-weight:800;margin-top:10px}
-.formrow{display:flex;gap:10px;flex-wrap:wrap}
-input,select,textarea{background:#fff;border:1px solid #dfe2ec;border-radius:10px;padding:12px;width:100%;outline:none}
-input:focus,select:focus,textarea:focus{border-color:#8174ef}
-.field{flex:1;min-width:145px;margin-bottom:12px}
-.field label{display:block;font-size:13px;margin-bottom:7px;color:#5e6376}
-.primary{background:#6558df;color:white}
-.secondary{background:#eeecff;color:#594bd2}
-.danger{background:#fff0f0;color:#c53f4c}
-.task{display:flex;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid #eff0f5}
-.task:last-child{border-bottom:0}
-.task input[type=checkbox]{width:18px;height:18px;flex-shrink:0}
-.taskbody{flex:1;min-width:0}
-.taskname{font-weight:650;overflow-wrap:anywhere}
-.done{text-decoration:line-through;color:#9296a5}
-.pill{display:inline-block;padding:5px 9px;border-radius:20px;background:#f0efff;color:#6154d4;font-size:12px;margin-top:6px}
-.error{color:#bd3447;background:#fff0f1;padding:10px;border-radius:9px;margin-bottom:12px;font-size:14px}
-.success{color:#16754b;background:#eaf9f0;padding:10px;border-radius:9px;margin-bottom:12px;font-size:14px}
-.auth{max-width:440px;margin:7vh auto;padding:20px}
-.auth .card{padding:30px}
-.auth .field{min-width:100%}
-.video{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #eee}
-.video input{width:18px;margin-top:4px}
-.small{font-size:12px;color:#777d91}
-.right{margin-left:auto}
-.empty{padding:25px 5px;text-align:center;color:#85899a}
-
-/* Mobile-friendly password field */
-.password-wrapper{
-  position:relative;
-  display:flex;
-  align-items:center;
-  width:100%;
-}
-.password-wrapper input{
-  display:block;
-  width:100%;
-  min-height:48px;
-  padding:12px 75px 12px 14px;
-  color:#20253a !important;
-  -webkit-text-fill-color:#20253a !important;
-  background:#ffffff !important;
-  font-size:16px !important;
-  opacity:1 !important;
-  visibility:visible !important;
-  caret-color:#6558df !important;
-}
-.password-wrapper .toggle-password{
-  position:absolute;
-  right:8px;
-  top:50%;
-  transform:translateY(-50%);
-  padding:7px 10px;
-  background:#eeecff;
-  color:#594bd2;
-  font-size:13px;
-  z-index:5;
-  width:auto;
-  white-space:nowrap;
-}
-.password-wrapper .toggle-password:active{
-  opacity:0.8;
-}
-
-@media(max-width:760px){
-  .app{display:block}
-  .sidebar{width:100%;padding:15px}
-  .brand{margin:5px 8px 15px}
-  .nav{flex-direction:row;overflow:auto}
-  .nav button{white-space:nowrap;padding:10px}
-  .main{padding:18px}
-  .grid{grid-template-columns:1fr}
-  .top{align-items:flex-start}
-  .top h1{font-size:23px}
-}
-`;
 
 function readToken(data) {
   return data?.access_token || data?.token || data?.accessToken || "";
@@ -113,16 +19,19 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [authMode, setAuthMode] = useState("login");
   const [page, setPage] = useState("Dashboard");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
+
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("");
   const [deadline, setDeadline] = useState("");
   const [reminder, setReminder] = useState("15");
   const [filter, setFilter] = useState("all");
+
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -130,6 +39,7 @@ export default function App() {
   const [videoLinks, setVideoLinks] = useState("");
   const [studyHours, setStudyHours] = useState("2");
   const [studyDays, setStudyDays] = useState("7");
+
   const [plan, setPlan] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("studysync_plan") || "[]");
@@ -141,9 +51,17 @@ export default function App() {
   const completed = tasks.filter(t => t.completed).length;
   const pending = tasks.length - completed;
 
-  const visibleTasks = useMemo(() => tasks.filter(t =>
-    filter === "all" ? true : filter === "pending" ? !t.completed : !!t.completed
-  ), [tasks, filter]);
+  const visibleTasks = useMemo(
+    () =>
+      tasks.filter(t =>
+        filter === "all"
+          ? true
+          : filter === "pending"
+            ? !t.completed
+            : !!t.completed
+      ),
+    [tasks, filter]
+  );
 
   async function api(path, options = {}) {
     const headers = {
@@ -152,10 +70,14 @@ export default function App() {
       ...options.headers
     };
 
-    const response = await fetch(`${API}${path}`, { ...options, headers });
-    const raw = await response.text();
+    const response = await fetch(`${API}${path}`, {
+      ...options,
+      headers
+    });
 
+    const raw = await response.text();
     let data = {};
+
     try {
       data = raw ? JSON.parse(raw) : {};
     } catch {
@@ -166,6 +88,7 @@ export default function App() {
       if (response.status === 401 && path !== "/auth/login") {
         localStorage.removeItem("studysync_token");
       }
+
       throw new Error(getError(data, `Request failed (${response.status})`));
     }
 
@@ -174,7 +97,9 @@ export default function App() {
 
   async function loadTasks(currentToken = token) {
     const response = await fetch(`${API}/tasks`, {
-      headers: currentToken ? { Authorization: `Bearer ${currentToken}` } : {}
+      headers: currentToken
+        ? { Authorization: `Bearer ${currentToken}` }
+        : {}
     });
 
     const raw = await response.text();
@@ -182,7 +107,9 @@ export default function App() {
 
     try {
       data = raw ? JSON.parse(raw) : {};
-    } catch {}
+    } catch {
+      data = {};
+    }
 
     if (!response.ok) {
       throw new Error(getError(data, "Could not load tasks."));
@@ -209,7 +136,7 @@ export default function App() {
 
     let cancelled = false;
 
-    (async () => {
+    async function initialize() {
       try {
         await loadUser(token);
         await loadTasks(token);
@@ -221,7 +148,9 @@ export default function App() {
           setUser(null);
         }
       }
-    })();
+    }
+
+    initialize();
 
     return () => {
       cancelled = true;
@@ -237,9 +166,10 @@ export default function App() {
     try {
       const path = authMode === "login" ? "/auth/login" : "/auth/signup";
 
-      const payload = authMode === "login"
-        ? { email, password }
-        : { name, email, password };
+      const payload =
+        authMode === "login"
+          ? { email, password }
+          : { name, email, password };
 
       const data = await api(path, {
         method: "POST",
@@ -257,7 +187,7 @@ export default function App() {
       }
 
       if (!newToken) {
-        throw new Error("Login response did not include an access token. Check your backend response format.");
+        throw new Error("Login response did not include an access token.");
       }
 
       localStorage.setItem("studysync_token", newToken);
@@ -266,7 +196,6 @@ export default function App() {
       setMessage("Welcome to StudySync AI!");
       setPassword("");
       setShowPassword(false);
-
     } catch (e) {
       setError(e.message);
     } finally {
@@ -283,13 +212,15 @@ export default function App() {
     setShowPassword(false);
     setPage("Dashboard");
     setError("");
+    setMessage("");
   }
 
   async function addTask(e) {
     e.preventDefault();
 
     if (!title.trim()) {
-      return setError("Please enter a task title.");
+      setError("Please enter a task title.");
+      return;
     }
 
     setError("");
@@ -312,7 +243,10 @@ export default function App() {
       const task = data.task || data;
 
       if (task.id != null || task.title) {
-        setTasks(prev => [task, ...prev.filter(t => t.id !== task.id)]);
+        setTasks(prev => [
+          task,
+          ...prev.filter(t => t.id !== task.id)
+        ]);
       } else {
         await loadTasks();
       }
@@ -321,7 +255,6 @@ export default function App() {
       setSubject("");
       setDeadline("");
       setMessage("Task added successfully!");
-
     } catch (e) {
       setError("Could not add task: " + e.message);
     }
@@ -338,12 +271,13 @@ export default function App() {
 
       const item = updated.task || updated;
 
-      setTasks(prev => prev.map(t =>
-        t.id === task.id
-          ? { ...t, ...item, completed: !task.completed }
-          : t
-      ));
-
+      setTasks(prev =>
+        prev.map(t =>
+          t.id === task.id
+            ? { ...t, ...item, completed: !task.completed }
+            : t
+        )
+      );
     } catch (e) {
       setError("Could not update task: " + e.message);
     }
@@ -366,41 +300,40 @@ export default function App() {
   function makePlan(e) {
     e.preventDefault();
 
-    const links = videoLinks.split("\n").map(x => x.trim()).filter(Boolean);
+    const links = videoLinks
+      .split("\n")
+      .map(x => x.trim())
+      .filter(Boolean);
 
     if (!links.length) {
-      return setError("Paste at least one YouTube video URL.");
+      setError("Paste at least one YouTube video URL.");
+      return;
     }
 
     const days = Math.max(1, Number(studyDays) || 1);
     const hours = Math.max(0.5, Number(studyHours) || 2);
 
-    const sessions = [];
-
-    links.forEach((url, index) => {
-      sessions.push({
-        id: `${Date.now()}-${index}`,
-        url,
-        title: `Video ${index + 1}`,
-        day: (index % days) + 1,
-        minutes: 30,
-        done: false
-      });
-    });
-
-    const generated = sessions.map((item, i) => ({
-      ...item,
-      activity: i % 3 === 0
-        ? "Watch and take notes"
-        : i % 3 === 1
-          ? "Watch and practise"
-          : "Revise key concepts"
+    const sessions = links.map((url, index) => ({
+      id: `${Date.now()}-${index}`,
+      url,
+      title: `Video ${index + 1}`,
+      day: (index % days) + 1,
+      minutes: 30,
+      done: false,
+      activity:
+        index % 3 === 0
+          ? "Watch and take notes"
+          : index % 3 === 1
+            ? "Watch and practise"
+            : "Revise key concepts"
     }));
 
-    setPlan(generated);
-    localStorage.setItem("studysync_plan", JSON.stringify(generated));
+    setPlan(sessions);
+    localStorage.setItem("studysync_plan", JSON.stringify(sessions));
     setError("");
-    setMessage(`Study plan created for ${links.length} videos. Estimated 30 minutes per video.`);
+    setMessage(
+      `Study plan created for ${links.length} videos. Estimated 30 minutes per video.`
+    );
   }
 
   function togglePlan(item) {
@@ -428,7 +361,13 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (!token || !("Notification" in window) || Notification.permission !== "granted") return;
+    if (
+      !token ||
+      !("Notification" in window) ||
+      Notification.permission !== "granted"
+    ) {
+      return;
+    }
 
     const check = () => {
       const now = Date.now();
@@ -437,11 +376,18 @@ export default function App() {
         if (!t.deadline || t.completed) return;
 
         const due = new Date(t.deadline).getTime();
-        const reminderMinutes = Number(t.reminder_minutes ?? t.reminderMinutes ?? 15);
+        const reminderMinutes = Number(
+          t.reminder_minutes ?? t.reminderMinutes ?? 15
+        );
+
         const notifyAt = due - reminderMinutes * 60000;
         const key = `studysync_notified_${t.id}_${due}`;
 
-        if (now >= notifyAt && now < due && !localStorage.getItem(key)) {
+        if (
+          now >= notifyAt &&
+          now < due &&
+          !localStorage.getItem(key)
+        ) {
           new Notification("StudySync AI reminder", {
             body: `${t.title} is due soon.`
           });
@@ -454,19 +400,20 @@ export default function App() {
     check();
 
     const interval = setInterval(check, 30000);
-
     return () => clearInterval(interval);
   }, [tasks, token]);
 
   if (!token || !user) {
-    return <>
-      <style>{styles}</style>
-
+    return (
       <div className="auth">
         <div className="brand">✦ StudySync AI</div>
 
-        <div className="card">
-          <h1>{authMode === "login" ? "Welcome back!" : "Create your account"}</h1>
+        <div className="card auth-card">
+          <h1>
+            {authMode === "login"
+              ? "Welcome back!"
+              : "Create your account"}
+          </h1>
 
           <p className="muted">
             Plan smarter. Learn consistently. Reach your goals.
@@ -512,14 +459,20 @@ export default function App() {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Enter password"
-                  autoComplete={authMode === "login" ? "current-password" : "new-password"}
+                  autoComplete={
+                    authMode === "login"
+                      ? "current-password"
+                      : "new-password"
+                  }
                 />
 
                 <button
                   type="button"
                   className="toggle-password"
                   onClick={() => setShowPassword(prev => !prev)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={
+                    showPassword ? "Hide password" : "Show password"
+                  }
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -527,9 +480,8 @@ export default function App() {
             </div>
 
             <button
-              className="primary"
+              className="primary auth-submit"
               disabled={busy}
-              style={{ width: "100%" }}
             >
               {busy
                 ? "Please wait..."
@@ -539,7 +491,7 @@ export default function App() {
             </button>
           </form>
 
-          <p className="muted" style={{ marginTop: 20 }}>
+          <p className="muted auth-switch">
             {authMode === "login"
               ? "New to StudySync? "
               : "Already have an account? "}
@@ -554,25 +506,22 @@ export default function App() {
                 setPassword("");
                 setShowPassword(false);
               }}
-              style={{ color: "#6558df", fontWeight: 700 }}
             >
               {authMode === "login" ? "Sign up" : "Login"}
             </a>
           </p>
         </div>
       </div>
-    </>;
+    );
   }
 
-  return <>
-    <style>{styles}</style>
-
+  return (
     <div className="app">
       <aside className="sidebar">
         <div className="brand">✦ StudySync AI</div>
 
         <div className="nav">
-          {["Dashboard", "My Tasks", "Study Planner"].map(item =>
+          {["Dashboard", "My Tasks", "Study Planner"].map(item => (
             <button
               key={item}
               className={page === item ? "active" : ""}
@@ -582,13 +531,20 @@ export default function App() {
                 setMessage("");
               }}
             >
-              {item === "Dashboard" ? "⌂  " : item === "My Tasks" ? "✓  " : "▶  "}
+              {item === "Dashboard"
+                ? "⌂  "
+                : item === "My Tasks"
+                  ? "✓  "
+                  : "▶  "}
               {item}
             </button>
-          )}
+          ))}
 
-          <button onClick={enableNotifications}>♧  Enable reminders</button>
-          <button onClick={logout}>↪  Logout</button>
+          <button onClick={enableNotifications}>
+            ♧ Enable reminders
+          </button>
+
+          <button onClick={logout}>↪ Logout</button>
         </div>
       </aside>
 
@@ -596,8 +552,11 @@ export default function App() {
         <div className="top">
           <div>
             <h1>
-              {page === "Dashboard" ? "Your learning dashboard" : page}
+              {page === "Dashboard"
+                ? "Your learning dashboard"
+                : page}
             </h1>
+
             <div className="muted">
               Small steps every day make big progress.
             </div>
@@ -611,225 +570,278 @@ export default function App() {
         {error && <div className="error">{error}</div>}
         {message && <div className="success">{message}</div>}
 
-        {page === "Dashboard" && <>
-          <div className="grid">
-            <div className="card">
-              <div className="muted">Total tasks</div>
-              <div className="stat">{tasks.length}</div>
+        {page === "Dashboard" && (
+          <>
+            <div className="grid">
+              <div className="card">
+                <div className="muted">Total tasks</div>
+                <div className="stat">{tasks.length}</div>
+              </div>
+
+              <div className="card">
+                <div className="muted">Pending tasks</div>
+                <div className="stat">{pending}</div>
+              </div>
+
+              <div className="card">
+                <div className="muted">Completed tasks</div>
+                <div className="stat">{completed}</div>
+              </div>
             </div>
 
             <div className="card">
-              <div className="muted">Pending tasks</div>
-              <div className="stat">{pending}</div>
+              <h2>Quick add task</h2>
+
+              <TaskForm
+                title={title}
+                setTitle={setTitle}
+                subject={subject}
+                setSubject={setSubject}
+                deadline={deadline}
+                setDeadline={setDeadline}
+                reminder={reminder}
+                setReminder={setReminder}
+                addTask={addTask}
+              />
             </div>
 
             <div className="card">
-              <div className="muted">Completed tasks</div>
-              <div className="stat">{completed}</div>
-            </div>
-          </div>
+              <h2>Upcoming work</h2>
 
-          <div className="card">
-            <h2>Quick add task</h2>
-            <TaskForm {...{
-              title, setTitle, subject, setSubject,
-              deadline, setDeadline, reminder, setReminder, addTask
-            }} />
-          </div>
-
-          <div className="card">
-            <h2>Upcoming work</h2>
-
-            {tasks.length === 0
-              ? <div className="empty">No tasks yet. Add your first task above!</div>
-              : tasks.filter(t => !t.completed).slice(0, 5).map(t =>
-                <TaskRow
-                  key={t.id}
-                  task={t}
-                  toggleTask={toggleTask}
-                  deleteTask={deleteTask}
-                />
+              {tasks.length === 0 ? (
+                <div className="empty">
+                  No tasks yet. Add your first task above!
+                </div>
+              ) : (
+                tasks
+                  .filter(t => !t.completed)
+                  .slice(0, 5)
+                  .map(t => (
+                    <TaskRow
+                      key={t.id}
+                      task={t}
+                      toggleTask={toggleTask}
+                      deleteTask={deleteTask}
+                    />
+                  ))
               )}
 
-            <button
-              className="secondary"
-              onClick={() => setPage("My Tasks")}
-            >
-              View all tasks
-            </button>
-          </div>
-        </>}
-
-        {page === "My Tasks" && <>
-          <div className="card">
-            <h2>Add a task</h2>
-            <TaskForm {...{
-              title, setTitle, subject, setSubject,
-              deadline, setDeadline, reminder, setReminder, addTask
-            }} />
-          </div>
-
-          <div className="card">
-            <div className="top">
-              <h2>All tasks ({tasks.length})</h2>
-
-              <select
-                style={{ width: 145 }}
-                value={filter}
-                onChange={e => setFilter(e.target.value)}
+              <button
+                className="secondary"
+                onClick={() => setPage("My Tasks")}
               >
-                <option value="all">All tasks</option>
-                <option value="pending">Pending</option>
-                <option value="completed">Completed</option>
-              </select>
+                View all tasks
+              </button>
+            </div>
+          </>
+        )}
+
+        {page === "My Tasks" && (
+          <>
+            <div className="card">
+              <h2>Add a task</h2>
+
+              <TaskForm
+                title={title}
+                setTitle={setTitle}
+                subject={subject}
+                setSubject={setSubject}
+                deadline={deadline}
+                setDeadline={setDeadline}
+                reminder={reminder}
+                setReminder={setReminder}
+                addTask={addTask}
+              />
             </div>
 
-            {visibleTasks.length === 0
-              ? <div className="empty">No tasks in this view.</div>
-              : visibleTasks.map(t =>
-                <TaskRow
-                  key={t.id}
-                  task={t}
-                  toggleTask={toggleTask}
-                  deleteTask={deleteTask}
-                />
+            <div className="card">
+              <div className="top">
+                <h2>All tasks ({tasks.length})</h2>
+
+                <select
+                  className="filter-select"
+                  value={filter}
+                  onChange={e => setFilter(e.target.value)}
+                >
+                  <option value="all">All tasks</option>
+                  <option value="pending">Pending</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+
+              {visibleTasks.length === 0 ? (
+                <div className="empty">
+                  No tasks in this view.
+                </div>
+              ) : (
+                visibleTasks.map(t => (
+                  <TaskRow
+                    key={t.id}
+                    task={t}
+                    toggleTask={toggleTask}
+                    deleteTask={deleteTask}
+                  />
+                ))
               )}
-          </div>
-        </>}
+            </div>
+          </>
+        )}
 
-        {page === "Study Planner" && <>
-          <div className="card">
-            <h2>Build your YouTube study plan</h2>
+        {page === "Study Planner" && (
+          <>
+            <div className="card">
+              <h2>Build your YouTube study plan</h2>
 
-            <p className="muted">
-              Paste one YouTube video URL per line and organise your study sessions.
-            </p>
+              <p className="muted">
+                Paste one YouTube video URL per line and organise your study sessions.
+              </p>
 
-            <form onSubmit={makePlan}>
-              <div className="field">
-                <label>YouTube video URLs</label>
-                <textarea
-                  rows={5}
-                  required
-                  value={videoLinks}
-                  onChange={e => setVideoLinks(e.target.value)}
-                  placeholder={"https://www.youtube.com/watch?v=...\nhttps://youtu.be/..."}
-                />
-              </div>
-
-              <div className="formrow">
+              <form onSubmit={makePlan}>
                 <div className="field">
-                  <label>Available hours per day</label>
-                  <input
-                    type="number"
-                    min="0.5"
-                    step="0.5"
-                    value={studyHours}
-                    onChange={e => setStudyHours(e.target.value)}
+                  <label>YouTube video URLs</label>
+
+                  <textarea
+                    rows={5}
+                    required
+                    value={videoLinks}
+                    onChange={e => setVideoLinks(e.target.value)}
+                    placeholder={"https://www.youtube.com/watch?v=...\nhttps://youtu.be/..."}
                   />
                 </div>
 
-                <div className="field">
-                  <label>Plan duration (days)</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="90"
-                    value={studyDays}
-                    onChange={e => setStudyDays(e.target.value)}
-                  />
-                </div>
-              </div>
+                <div className="formrow">
+                  <div className="field">
+                    <label>Available hours per day</label>
 
-              <button className="primary">Generate study plan</button>
-            </form>
-          </div>
+                    <input
+                      type="number"
+                      min="0.5"
+                      step="0.5"
+                      value={studyHours}
+                      onChange={e => setStudyHours(e.target.value)}
+                    />
+                  </div>
 
-          <div className="card">
-            <h2>
-              Your plan ({plan.filter(p => p.done).length}/{plan.length} complete)
-            </h2>
+                  <div className="field">
+                    <label>Plan duration (days)</label>
 
-            {plan.length === 0
-              ? <div className="empty">Your generated sessions will appear here.</div>
-              : plan.map(item =>
-                <div className="video" key={item.id}>
-                  <input
-                    type="checkbox"
-                    checked={item.done}
-                    onChange={() => togglePlan(item)}
-                  />
-
-                  <div style={{ flex: 1 }}>
-                    <div className={item.done ? "taskname done" : "taskname"}>
-                      Day {item.day} · {item.title}
-                    </div>
-
-                    <div className="muted">
-                      {item.activity} · {item.minutes} minutes
-                    </div>
-
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      style={{
-                        color: "#6558df",
-                        fontSize: 13,
-                        overflowWrap: "anywhere"
-                      }}
-                    >
-                      {item.url}
-                    </a>
+                    <input
+                      type="number"
+                      min="1"
+                      max="90"
+                      value={studyDays}
+                      onChange={e => setStudyDays(e.target.value)}
+                    />
                   </div>
                 </div>
+
+                <button className="primary">
+                  Generate study plan
+                </button>
+              </form>
+            </div>
+
+            <div className="card">
+              <h2>
+                Your plan ({plan.filter(p => p.done).length}/{plan.length} complete)
+              </h2>
+
+              {plan.length === 0 ? (
+                <div className="empty">
+                  Your generated sessions will appear here.
+                </div>
+              ) : (
+                plan.map(item => (
+                  <div className="video" key={item.id}>
+                    <input
+                      type="checkbox"
+                      checked={item.done}
+                      onChange={() => togglePlan(item)}
+                    />
+
+                    <div className="video-content">
+                      <div className={item.done ? "taskname done" : "taskname"}>
+                        Day {item.day} · {item.title}
+                      </div>
+
+                      <div className="muted">
+                        {item.activity} · {item.minutes} minutes
+                      </div>
+
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="video-link"
+                      >
+                        {item.url}
+                      </a>
+                    </div>
+                  </div>
+                ))
               )}
 
-            {plan.length > 0 && (
-              <button
-                className="danger"
-                onClick={() => {
-                  setPlan([]);
-                  localStorage.removeItem("studysync_plan");
-                }}
-              >
-                Clear plan
-              </button>
-            )}
-          </div>
+              {plan.length > 0 && (
+                <button
+                  className="danger"
+                  onClick={() => {
+                    setPlan([]);
+                    localStorage.removeItem("studysync_plan");
+                  }}
+                >
+                  Clear plan
+                </button>
+              )}
+            </div>
 
-          <p className="small">
-            Note: This version organises the URLs you enter. It does not automatically read YouTube playlist contents or actual video durations.
-          </p>
-        </>}
+            <p className="small">
+              Note: This version organises the URLs you enter. It does not automatically read YouTube playlist contents or actual video durations.
+            </p>
+          </>
+        )}
       </main>
     </div>
-  </>;
+  );
 }
 
 function TaskForm({
-  title, setTitle, subject, setSubject,
-  deadline, setDeadline, reminder, setReminder, addTask
+  title,
+  setTitle,
+  subject,
+  setSubject,
+  deadline,
+  setDeadline,
+  reminder,
+  setReminder,
+  addTask
 }) {
   return (
     <form onSubmit={addTask}>
       <div className="formrow">
         <div className="field">
           <label>Task title</label>
+
           <input
+            type="text"
             required
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="e.g. Complete DBMS assignment"
+            autoComplete="off"
+            autoCapitalize="sentences"
+            spellCheck="true"
           />
         </div>
 
         <div className="field">
           <label>Subject</label>
+
           <input
+            type="text"
             value={subject}
             onChange={e => setSubject(e.target.value)}
             placeholder="e.g. DBMS"
+            autoComplete="off"
           />
         </div>
       </div>
@@ -837,6 +849,7 @@ function TaskForm({
       <div className="formrow">
         <div className="field">
           <label>Deadline</label>
+
           <input
             type="datetime-local"
             value={deadline}
@@ -846,6 +859,7 @@ function TaskForm({
 
         <div className="field">
           <label>Reminder before deadline</label>
+
           <select
             value={reminder}
             onChange={e => setReminder(e.target.value)}
