@@ -2,30 +2,100 @@
 import { useEffect, useMemo, useState } from "react";
 
 const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+
 const styles = `
-*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f5f7fb;color:#20253a}
-button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:11px 15px;font-weight:600}
-.app{min-height:100vh;display:flex}.sidebar{width:235px;background:#fff;border-right:1px solid #e8eaf1;padding:25px 16px;flex-shrink:0}
-.brand{font-size:22px;font-weight:800;color:#6558df;margin:0 8px 35px}.nav{display:flex;flex-direction:column;gap:8px}
-.nav button{text-align:left;background:transparent;color:#62677a}.nav button.active,.nav button:hover{background:#eeecff;color:#594bd2}
-.main{padding:30px;width:100%;max-width:1250px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:25px}
-h1{font-size:27px;margin:0 0 7px}h2{font-size:19px;margin:0 0 16px}.muted{color:#777d91;font-size:14px}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f5f7fb;color:#20253a}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:10px;padding:11px 15px;font-weight:600}
+.app{min-height:100vh;display:flex}
+.sidebar{width:235px;background:#fff;border-right:1px solid #e8eaf1;padding:25px 16px;flex-shrink:0}
+.brand{font-size:22px;font-weight:800;color:#6558df;margin:0 8px 35px}
+.nav{display:flex;flex-direction:column;gap:8px}
+.nav button{text-align:left;background:transparent;color:#62677a}
+.nav button.active,.nav button:hover{background:#eeecff;color:#594bd2}
+.main{padding:30px;width:100%;max-width:1250px;margin:auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:25px}
+h1{font-size:27px;margin:0 0 7px}
+h2{font-size:19px;margin:0 0 16px}
+.muted{color:#777d91;font-size:14px}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:22px}
 .card{background:#fff;border:1px solid #e9ebf2;border-radius:17px;padding:21px;box-shadow:0 4px 16px #20253a05;margin-bottom:18px}
-.stat{font-size:29px;font-weight:800;margin-top:10px}.formrow{display:flex;gap:10px;flex-wrap:wrap}
+.stat{font-size:29px;font-weight:800;margin-top:10px}
+.formrow{display:flex;gap:10px;flex-wrap:wrap}
 input,select,textarea{background:#fff;border:1px solid #dfe2ec;border-radius:10px;padding:12px;width:100%;outline:none}
 input:focus,select:focus,textarea:focus{border-color:#8174ef}
-.field{flex:1;min-width:145px;margin-bottom:12px}.field label{display:block;font-size:13px;margin-bottom:7px;color:#5e6376}
-.primary{background:#6558df;color:white}.secondary{background:#eeecff;color:#594bd2}.danger{background:#fff0f0;color:#c53f4c}
-.task{display:flex;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid #eff0f5}.task:last-child{border-bottom:0}
-.task input[type=checkbox]{width:18px;height:18px;flex-shrink:0}.taskbody{flex:1;min-width:0}.taskname{font-weight:650;overflow-wrap:anywhere}.done{text-decoration:line-through;color:#9296a5}
+.field{flex:1;min-width:145px;margin-bottom:12px}
+.field label{display:block;font-size:13px;margin-bottom:7px;color:#5e6376}
+.primary{background:#6558df;color:white}
+.secondary{background:#eeecff;color:#594bd2}
+.danger{background:#fff0f0;color:#c53f4c}
+.task{display:flex;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid #eff0f5}
+.task:last-child{border-bottom:0}
+.task input[type=checkbox]{width:18px;height:18px;flex-shrink:0}
+.taskbody{flex:1;min-width:0}
+.taskname{font-weight:650;overflow-wrap:anywhere}
+.done{text-decoration:line-through;color:#9296a5}
 .pill{display:inline-block;padding:5px 9px;border-radius:20px;background:#f0efff;color:#6154d4;font-size:12px;margin-top:6px}
 .error{color:#bd3447;background:#fff0f1;padding:10px;border-radius:9px;margin-bottom:12px;font-size:14px}
 .success{color:#16754b;background:#eaf9f0;padding:10px;border-radius:9px;margin-bottom:12px;font-size:14px}
-.auth{max-width:440px;margin:7vh auto;padding:20px}.auth .card{padding:30px}.auth .field{min-width:100%}
-.video{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #eee}.video input{width:18px;margin-top:4px}
-.small{font-size:12px;color:#777d91}.right{margin-left:auto}.empty{padding:25px 5px;text-align:center;color:#85899a}
-@media(max-width:760px){.app{display:block}.sidebar{width:100%;padding:15px}.brand{margin:5px 8px 15px}.nav{flex-direction:row;overflow:auto}.nav button{white-space:nowrap;padding:10px}.main{padding:18px}.grid{grid-template-columns:1fr}.top{align-items:flex-start}.top h1{font-size:23px}}
+.auth{max-width:440px;margin:7vh auto;padding:20px}
+.auth .card{padding:30px}
+.auth .field{min-width:100%}
+.video{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #eee}
+.video input{width:18px;margin-top:4px}
+.small{font-size:12px;color:#777d91}
+.right{margin-left:auto}
+.empty{padding:25px 5px;text-align:center;color:#85899a}
+
+/* Mobile-friendly password field */
+.password-wrapper{
+  position:relative;
+  display:flex;
+  align-items:center;
+  width:100%;
+}
+.password-wrapper input{
+  display:block;
+  width:100%;
+  min-height:48px;
+  padding:12px 75px 12px 14px;
+  color:#20253a !important;
+  -webkit-text-fill-color:#20253a !important;
+  background:#ffffff !important;
+  font-size:16px !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  caret-color:#6558df !important;
+}
+.password-wrapper .toggle-password{
+  position:absolute;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  padding:7px 10px;
+  background:#eeecff;
+  color:#594bd2;
+  font-size:13px;
+  z-index:5;
+  width:auto;
+  white-space:nowrap;
+}
+.password-wrapper .toggle-password:active{
+  opacity:0.8;
+}
+
+@media(max-width:760px){
+  .app{display:block}
+  .sidebar{width:100%;padding:15px}
+  .brand{margin:5px 8px 15px}
+  .nav{flex-direction:row;overflow:auto}
+  .nav button{white-space:nowrap;padding:10px}
+  .main{padding:18px}
+  .grid{grid-template-columns:1fr}
+  .top{align-items:flex-start}
+  .top h1{font-size:23px}
+}
 `;
 
 function readToken(data) {
@@ -45,6 +115,7 @@ export default function App() {
   const [page, setPage] = useState("Dashboard");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
@@ -60,28 +131,44 @@ export default function App() {
   const [studyHours, setStudyHours] = useState("2");
   const [studyDays, setStudyDays] = useState("7");
   const [plan, setPlan] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("studysync_plan") || "[]"); }
-    catch { return []; }
+    try {
+      return JSON.parse(localStorage.getItem("studysync_plan") || "[]");
+    } catch {
+      return [];
+    }
   });
 
   const completed = tasks.filter(t => t.completed).length;
   const pending = tasks.length - completed;
+
   const visibleTasks = useMemo(() => tasks.filter(t =>
     filter === "all" ? true : filter === "pending" ? !t.completed : !!t.completed
   ), [tasks, filter]);
 
   async function api(path, options = {}) {
-    const headers = { ...(options.body ? { "Content-Type": "application/json" } : {}), ...(token ? { Authorization: `Bearer ${token}` } : {}), ...options.headers };
+    const headers = {
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...options.headers
+    };
+
     const response = await fetch(`${API}${path}`, { ...options, headers });
     const raw = await response.text();
+
     let data = {};
-    try { data = raw ? JSON.parse(raw) : {}; } catch { data = { message: raw }; }
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      data = { message: raw };
+    }
+
     if (!response.ok) {
       if (response.status === 401 && path !== "/auth/login") {
         localStorage.removeItem("studysync_token");
       }
       throw new Error(getError(data, `Request failed (${response.status})`));
     }
+
     return data;
   }
 
@@ -89,10 +176,18 @@ export default function App() {
     const response = await fetch(`${API}/tasks`, {
       headers: currentToken ? { Authorization: `Bearer ${currentToken}` } : {}
     });
+
     const raw = await response.text();
     let data = {};
-    try { data = raw ? JSON.parse(raw) : {}; } catch {}
-    if (!response.ok) throw new Error(getError(data, "Could not load tasks."));
+
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {}
+
+    if (!response.ok) {
+      throw new Error(getError(data, "Could not load tasks."));
+    }
+
     setTasks(Array.isArray(data) ? data : data.tasks || data.items || []);
   }
 
@@ -100,14 +195,20 @@ export default function App() {
     const response = await fetch(`${API}/auth/me`, {
       headers: { Authorization: `Bearer ${currentToken}` }
     });
-    if (!response.ok) throw new Error("Session expired. Please log in again.");
+
+    if (!response.ok) {
+      throw new Error("Session expired. Please log in again.");
+    }
+
     const data = await response.json();
     setUser(data.user || data);
   }
 
   useEffect(() => {
     if (!token) return;
+
     let cancelled = false;
+
     (async () => {
       try {
         await loadUser(token);
@@ -121,30 +222,51 @@ export default function App() {
         }
       }
     })();
-    return () => { cancelled = true; };
+
+    return () => {
+      cancelled = true;
+    };
   }, [token]);
 
   async function handleAuth(e) {
     e.preventDefault();
-    setError(""); setMessage(""); setBusy(true);
+    setError("");
+    setMessage("");
+    setBusy(true);
+
     try {
       const path = authMode === "login" ? "/auth/login" : "/auth/signup";
+
       const payload = authMode === "login"
         ? { email, password }
         : { name, email, password };
-      const data = await api(path, { method: "POST", body: JSON.stringify(payload) });
-      let newToken = readToken(data);
+
+      const data = await api(path, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      const newToken = readToken(data);
 
       if (!newToken && authMode === "signup") {
         setAuthMode("login");
+        setPassword("");
+        setShowPassword(false);
         setMessage("Account created if registration succeeded. Please log in.");
         return;
       }
-      if (!newToken) throw new Error("Login response did not include an access token. Check your backend response format.");
+
+      if (!newToken) {
+        throw new Error("Login response did not include an access token. Check your backend response format.");
+      }
+
       localStorage.setItem("studysync_token", newToken);
       setUser(data.user || null);
       setToken(newToken);
       setMessage("Welcome to StudySync AI!");
+      setPassword("");
+      setShowPassword(false);
+
     } catch (e) {
       setError(e.message);
     } finally {
@@ -154,14 +276,25 @@ export default function App() {
 
   function logout() {
     localStorage.removeItem("studysync_token");
-    setToken(""); setUser(null); setTasks([]);
-    setPassword(""); setPage("Dashboard"); setError("");
+    setToken("");
+    setUser(null);
+    setTasks([]);
+    setPassword("");
+    setShowPassword(false);
+    setPage("Dashboard");
+    setError("");
   }
 
   async function addTask(e) {
     e.preventDefault();
-    if (!title.trim()) return setError("Please enter a task title.");
-    setError(""); setMessage("");
+
+    if (!title.trim()) {
+      return setError("Please enter a task title.");
+    }
+
+    setError("");
+    setMessage("");
+
     try {
       const payload = {
         title: title.trim(),
@@ -170,44 +303,80 @@ export default function App() {
         reminder_minutes: Number(reminder),
         completed: false
       };
-      const data = await api("/tasks", { method: "POST", body: JSON.stringify(payload) });
+
+      const data = await api("/tasks", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
       const task = data.task || data;
-      if (task.id != null || task.title) setTasks(prev => [task, ...prev.filter(t => t.id !== task.id)]);
-      else await loadTasks();
-      setTitle(""); setSubject(""); setDeadline("");
+
+      if (task.id != null || task.title) {
+        setTasks(prev => [task, ...prev.filter(t => t.id !== task.id)]);
+      } else {
+        await loadTasks();
+      }
+
+      setTitle("");
+      setSubject("");
+      setDeadline("");
       setMessage("Task added successfully!");
-    } catch (e) { setError("Could not add task: " + e.message); }
+
+    } catch (e) {
+      setError("Could not add task: " + e.message);
+    }
   }
 
   async function toggleTask(task) {
     setError("");
+
     try {
       const updated = await api(`/tasks/${task.id}`, {
         method: "PATCH",
         body: JSON.stringify({ completed: !task.completed })
       });
+
       const item = updated.task || updated;
-      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, ...item, completed: !task.completed } : t));
-    } catch (e) { setError("Could not update task: " + e.message); }
+
+      setTasks(prev => prev.map(t =>
+        t.id === task.id
+          ? { ...t, ...item, completed: !task.completed }
+          : t
+      ));
+
+    } catch (e) {
+      setError("Could not update task: " + e.message);
+    }
   }
 
   async function deleteTask(task) {
     if (!window.confirm(`Delete "${task.title}"?`)) return;
+
     setError("");
+
     try {
       await api(`/tasks/${task.id}`, { method: "DELETE" });
       setTasks(prev => prev.filter(t => t.id !== task.id));
       setMessage("Task deleted.");
-    } catch (e) { setError("Could not delete task: " + e.message); }
+    } catch (e) {
+      setError("Could not delete task: " + e.message);
+    }
   }
 
   function makePlan(e) {
     e.preventDefault();
+
     const links = videoLinks.split("\n").map(x => x.trim()).filter(Boolean);
-    if (!links.length) return setError("Paste at least one YouTube video URL.");
+
+    if (!links.length) {
+      return setError("Paste at least one YouTube video URL.");
+    }
+
     const days = Math.max(1, Number(studyDays) || 1);
     const hours = Math.max(0.5, Number(studyHours) || 2);
+
     const sessions = [];
+
     links.forEach((url, index) => {
       sessions.push({
         id: `${Date.now()}-${index}`,
@@ -218,10 +387,16 @@ export default function App() {
         done: false
       });
     });
+
     const generated = sessions.map((item, i) => ({
       ...item,
-      activity: i % 3 === 0 ? "Watch and take notes" : i % 3 === 1 ? "Watch and practise" : "Revise key concepts"
+      activity: i % 3 === 0
+        ? "Watch and take notes"
+        : i % 3 === 1
+          ? "Watch and practise"
+          : "Revise key concepts"
     }));
+
     setPlan(generated);
     localStorage.setItem("studysync_plan", JSON.stringify(generated));
     setError("");
@@ -229,59 +404,158 @@ export default function App() {
   }
 
   function togglePlan(item) {
-    const next = plan.map(p => p.id === item.id ? { ...p, done: !p.done } : p);
+    const next = plan.map(p =>
+      p.id === item.id ? { ...p, done: !p.done } : p
+    );
+
     setPlan(next);
     localStorage.setItem("studysync_plan", JSON.stringify(next));
   }
 
   async function enableNotifications() {
     if (!("Notification" in window)) {
-      setError("This browser does not support notifications."); return;
+      setError("This browser does not support notifications.");
+      return;
     }
+
     const result = await Notification.requestPermission();
-    setMessage(result === "granted" ? "Notifications enabled. Keep StudySync open to receive reminders." : "Notification permission was not granted.");
+
+    setMessage(
+      result === "granted"
+        ? "Notifications enabled. Keep StudySync open to receive reminders."
+        : "Notification permission was not granted."
+    );
   }
 
   useEffect(() => {
-    if (!token || Notification.permission !== "granted") return;
+    if (!token || !("Notification" in window) || Notification.permission !== "granted") return;
+
     const check = () => {
       const now = Date.now();
+
       tasks.forEach(t => {
         if (!t.deadline || t.completed) return;
+
         const due = new Date(t.deadline).getTime();
         const reminderMinutes = Number(t.reminder_minutes ?? t.reminderMinutes ?? 15);
         const notifyAt = due - reminderMinutes * 60000;
         const key = `studysync_notified_${t.id}_${due}`;
+
         if (now >= notifyAt && now < due && !localStorage.getItem(key)) {
-          new Notification("StudySync AI reminder", { body: `${t.title} is due soon.` });
+          new Notification("StudySync AI reminder", {
+            body: `${t.title} is due soon.`
+          });
+
           localStorage.setItem(key, "yes");
         }
       });
     };
+
     check();
+
     const interval = setInterval(check, 30000);
+
     return () => clearInterval(interval);
   }, [tasks, token]);
 
   if (!token || !user) {
     return <>
       <style>{styles}</style>
+
       <div className="auth">
         <div className="brand">✦ StudySync AI</div>
+
         <div className="card">
           <h1>{authMode === "login" ? "Welcome back!" : "Create your account"}</h1>
-          <p className="muted">Plan smarter. Learn consistently. Reach your goals.</p>
+
+          <p className="muted">
+            Plan smarter. Learn consistently. Reach your goals.
+          </p>
+
           {error && <div className="error">{error}</div>}
           {message && <div className="success">{message}</div>}
+
           <form onSubmit={handleAuth}>
-            {authMode === "signup" && <div className="field"><label>Full name</label><input required value={name} onChange={e => setName(e.target.value)} placeholder="Your name" /></div>}
-            <div className="field"><label>Email address</label><input required type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" /></div>
-            <div className="field"><label>Password</label><input required type="password" minLength={6} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password" /></div>
-            <button className="primary" disabled={busy} style={{ width: "100%" }}>{busy ? "Please wait..." : authMode === "login" ? "Login" : "Create account"}</button>
+            {authMode === "signup" && (
+              <div className="field">
+                <label>Full name</label>
+                <input
+                  required
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Your name"
+                  autoComplete="name"
+                />
+              </div>
+            )}
+
+            <div className="field">
+              <label>Email address</label>
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                autoComplete="email"
+              />
+            </div>
+
+            <div className="field">
+              <label>Password</label>
+
+              <div className="password-wrapper">
+                <input
+                  required
+                  type={showPassword ? "text" : "password"}
+                  minLength={6}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Enter password"
+                  autoComplete={authMode === "login" ? "current-password" : "new-password"}
+                />
+
+                <button
+                  type="button"
+                  className="toggle-password"
+                  onClick={() => setShowPassword(prev => !prev)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+            </div>
+
+            <button
+              className="primary"
+              disabled={busy}
+              style={{ width: "100%" }}
+            >
+              {busy
+                ? "Please wait..."
+                : authMode === "login"
+                  ? "Login"
+                  : "Create account"}
+            </button>
           </form>
+
           <p className="muted" style={{ marginTop: 20 }}>
-            {authMode === "login" ? "New to StudySync? " : "Already have an account? "}
-            <a href="#" onClick={e => { e.preventDefault(); setAuthMode(authMode === "login" ? "signup" : "login"); setError(""); setMessage(""); }} style={{ color: "#6558df", fontWeight: 700 }}>
+            {authMode === "login"
+              ? "New to StudySync? "
+              : "Already have an account? "}
+
+            <a
+              href="#"
+              onClick={e => {
+                e.preventDefault();
+                setAuthMode(authMode === "login" ? "signup" : "login");
+                setError("");
+                setMessage("");
+                setPassword("");
+                setShowPassword(false);
+              }}
+              style={{ color: "#6558df", fontWeight: 700 }}
+            >
               {authMode === "login" ? "Sign up" : "Login"}
             </a>
           </p>
@@ -292,24 +566,46 @@ export default function App() {
 
   return <>
     <style>{styles}</style>
+
     <div className="app">
       <aside className="sidebar">
         <div className="brand">✦ StudySync AI</div>
+
         <div className="nav">
           {["Dashboard", "My Tasks", "Study Planner"].map(item =>
-            <button key={item} className={page === item ? "active" : ""} onClick={() => { setPage(item); setError(""); setMessage(""); }}>{item === "Dashboard" ? "⌂  " : item === "My Tasks" ? "✓  " : "▶  "}{item}</button>
+            <button
+              key={item}
+              className={page === item ? "active" : ""}
+              onClick={() => {
+                setPage(item);
+                setError("");
+                setMessage("");
+              }}
+            >
+              {item === "Dashboard" ? "⌂  " : item === "My Tasks" ? "✓  " : "▶  "}
+              {item}
+            </button>
           )}
+
           <button onClick={enableNotifications}>♧  Enable reminders</button>
           <button onClick={logout}>↪  Logout</button>
         </div>
       </aside>
+
       <main className="main">
         <div className="top">
           <div>
-            <h1>{page === "Dashboard" ? "Your learning dashboard" : page}</h1>
-            <div className="muted">Small steps every day make big progress.</div>
+            <h1>
+              {page === "Dashboard" ? "Your learning dashboard" : page}
+            </h1>
+            <div className="muted">
+              Small steps every day make big progress.
+            </div>
           </div>
-          <div className="pill">{user.name || user.full_name || user.email || "Student"}</div>
+
+          <div className="pill">
+            {user.name || user.full_name || user.email || "Student"}
+          </div>
         </div>
 
         {error && <div className="error">{error}</div>}
@@ -317,93 +613,286 @@ export default function App() {
 
         {page === "Dashboard" && <>
           <div className="grid">
-            <div className="card"><div className="muted">Total tasks</div><div className="stat">{tasks.length}</div></div>
-            <div className="card"><div className="muted">Pending tasks</div><div className="stat">{pending}</div></div>
-            <div className="card"><div className="muted">Completed tasks</div><div className="stat">{completed}</div></div>
+            <div className="card">
+              <div className="muted">Total tasks</div>
+              <div className="stat">{tasks.length}</div>
+            </div>
+
+            <div className="card">
+              <div className="muted">Pending tasks</div>
+              <div className="stat">{pending}</div>
+            </div>
+
+            <div className="card">
+              <div className="muted">Completed tasks</div>
+              <div className="stat">{completed}</div>
+            </div>
           </div>
+
           <div className="card">
             <h2>Quick add task</h2>
-            <TaskForm {...{ title, setTitle, subject, setSubject, deadline, setDeadline, reminder, setReminder, addTask }} />
+            <TaskForm {...{
+              title, setTitle, subject, setSubject,
+              deadline, setDeadline, reminder, setReminder, addTask
+            }} />
           </div>
+
           <div className="card">
             <h2>Upcoming work</h2>
-            {tasks.length === 0 ? <div className="empty">No tasks yet. Add your first task above!</div> :
-              tasks.filter(t => !t.completed).slice(0, 5).map(t => <TaskRow key={t.id} task={t} toggleTask={toggleTask} deleteTask={deleteTask} />)}
-            <button className="secondary" onClick={() => setPage("My Tasks")}>View all tasks</button>
+
+            {tasks.length === 0
+              ? <div className="empty">No tasks yet. Add your first task above!</div>
+              : tasks.filter(t => !t.completed).slice(0, 5).map(t =>
+                <TaskRow
+                  key={t.id}
+                  task={t}
+                  toggleTask={toggleTask}
+                  deleteTask={deleteTask}
+                />
+              )}
+
+            <button
+              className="secondary"
+              onClick={() => setPage("My Tasks")}
+            >
+              View all tasks
+            </button>
           </div>
         </>}
 
         {page === "My Tasks" && <>
           <div className="card">
             <h2>Add a task</h2>
-            <TaskForm {...{ title, setTitle, subject, setSubject, deadline, setDeadline, reminder, setReminder, addTask }} />
+            <TaskForm {...{
+              title, setTitle, subject, setSubject,
+              deadline, setDeadline, reminder, setReminder, addTask
+            }} />
           </div>
+
           <div className="card">
-            <div className="top"><h2>All tasks ({tasks.length})</h2>
-              <select style={{ width: 145 }} value={filter} onChange={e => setFilter(e.target.value)}>
-                <option value="all">All tasks</option><option value="pending">Pending</option><option value="completed">Completed</option>
+            <div className="top">
+              <h2>All tasks ({tasks.length})</h2>
+
+              <select
+                style={{ width: 145 }}
+                value={filter}
+                onChange={e => setFilter(e.target.value)}
+              >
+                <option value="all">All tasks</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
               </select>
             </div>
-            {visibleTasks.length === 0 ? <div className="empty">No tasks in this view.</div> : visibleTasks.map(t => <TaskRow key={t.id} task={t} toggleTask={toggleTask} deleteTask={deleteTask} />)}
+
+            {visibleTasks.length === 0
+              ? <div className="empty">No tasks in this view.</div>
+              : visibleTasks.map(t =>
+                <TaskRow
+                  key={t.id}
+                  task={t}
+                  toggleTask={toggleTask}
+                  deleteTask={deleteTask}
+                />
+              )}
           </div>
         </>}
 
         {page === "Study Planner" && <>
           <div className="card">
             <h2>Build your YouTube study plan</h2>
-            <p className="muted">Paste one YouTube video URL per line and organise your study sessions.</p>
+
+            <p className="muted">
+              Paste one YouTube video URL per line and organise your study sessions.
+            </p>
+
             <form onSubmit={makePlan}>
-              <div className="field"><label>YouTube video URLs</label><textarea rows={5} required value={videoLinks} onChange={e => setVideoLinks(e.target.value)} placeholder={"https://www.youtube.com/watch?v=...\nhttps://youtu.be/..."} /></div>
-              <div className="formrow">
-                <div className="field"><label>Available hours per day</label><input type="number" min="0.5" step="0.5" value={studyHours} onChange={e => setStudyHours(e.target.value)} /></div>
-                <div className="field"><label>Plan duration (days)</label><input type="number" min="1" max="90" value={studyDays} onChange={e => setStudyDays(e.target.value)} /></div>
+              <div className="field">
+                <label>YouTube video URLs</label>
+                <textarea
+                  rows={5}
+                  required
+                  value={videoLinks}
+                  onChange={e => setVideoLinks(e.target.value)}
+                  placeholder={"https://www.youtube.com/watch?v=...\nhttps://youtu.be/..."}
+                />
               </div>
+
+              <div className="formrow">
+                <div className="field">
+                  <label>Available hours per day</label>
+                  <input
+                    type="number"
+                    min="0.5"
+                    step="0.5"
+                    value={studyHours}
+                    onChange={e => setStudyHours(e.target.value)}
+                  />
+                </div>
+
+                <div className="field">
+                  <label>Plan duration (days)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="90"
+                    value={studyDays}
+                    onChange={e => setStudyDays(e.target.value)}
+                  />
+                </div>
+              </div>
+
               <button className="primary">Generate study plan</button>
             </form>
           </div>
+
           <div className="card">
-            <h2>Your plan ({plan.filter(p => p.done).length}/{plan.length} complete)</h2>
-            {plan.length === 0 ? <div className="empty">Your generated sessions will appear here.</div> : plan.map((item, i) =>
-              <div className="video" key={item.id}>
-                <input type="checkbox" checked={item.done} onChange={() => togglePlan(item)} />
-                <div style={{ flex: 1 }}>
-                  <div className={item.done ? "taskname done" : "taskname"}>Day {item.day} · {item.title}</div>
-                  <div className="muted">{item.activity} · {item.minutes} minutes</div>
-                  <a href={item.url} target="_blank" rel="noreferrer" style={{ color: "#6558df", fontSize: 13, overflowWrap: "anywhere" }}>{item.url}</a>
+            <h2>
+              Your plan ({plan.filter(p => p.done).length}/{plan.length} complete)
+            </h2>
+
+            {plan.length === 0
+              ? <div className="empty">Your generated sessions will appear here.</div>
+              : plan.map(item =>
+                <div className="video" key={item.id}>
+                  <input
+                    type="checkbox"
+                    checked={item.done}
+                    onChange={() => togglePlan(item)}
+                  />
+
+                  <div style={{ flex: 1 }}>
+                    <div className={item.done ? "taskname done" : "taskname"}>
+                      Day {item.day} · {item.title}
+                    </div>
+
+                    <div className="muted">
+                      {item.activity} · {item.minutes} minutes
+                    </div>
+
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        color: "#6558df",
+                        fontSize: 13,
+                        overflowWrap: "anywhere"
+                      }}
+                    >
+                      {item.url}
+                    </a>
+                  </div>
                 </div>
-              </div>
+              )}
+
+            {plan.length > 0 && (
+              <button
+                className="danger"
+                onClick={() => {
+                  setPlan([]);
+                  localStorage.removeItem("studysync_plan");
+                }}
+              >
+                Clear plan
+              </button>
             )}
-            {plan.length > 0 && <button className="danger" onClick={() => { setPlan([]); localStorage.removeItem("studysync_plan"); }}>Clear plan</button>}
           </div>
-          <p className="small">Note: This version organises the URLs you enter. It does not automatically read YouTube playlist contents or actual video durations.</p>
+
+          <p className="small">
+            Note: This version organises the URLs you enter. It does not automatically read YouTube playlist contents or actual video durations.
+          </p>
         </>}
       </main>
     </div>
   </>;
 }
 
-function TaskForm({ title, setTitle, subject, setSubject, deadline, setDeadline, reminder, setReminder, addTask }) {
-  return <form onSubmit={addTask}>
-    <div className="formrow">
-      <div className="field"><label>Task title</label><input required value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Complete DBMS assignment" /></div>
-      <div className="field"><label>Subject</label><input value={subject} onChange={e => setSubject(e.target.value)} placeholder="e.g. DBMS" /></div>
-    </div>
-    <div className="formrow">
-      <div className="field"><label>Deadline</label><input type="datetime-local" value={deadline} onChange={e => setDeadline(e.target.value)} /></div>
-      <div className="field"><label>Reminder before deadline</label><select value={reminder} onChange={e => setReminder(e.target.value)}><option value="0">At deadline</option><option value="5">5 minutes</option><option value="15">15 minutes</option><option value="30">30 minutes</option><option value="60">1 hour</option><option value="1440">1 day</option></select></div>
-    </div>
-    <button className="primary">+ Add task</button>
-  </form>;
+function TaskForm({
+  title, setTitle, subject, setSubject,
+  deadline, setDeadline, reminder, setReminder, addTask
+}) {
+  return (
+    <form onSubmit={addTask}>
+      <div className="formrow">
+        <div className="field">
+          <label>Task title</label>
+          <input
+            required
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            placeholder="e.g. Complete DBMS assignment"
+          />
+        </div>
+
+        <div className="field">
+          <label>Subject</label>
+          <input
+            value={subject}
+            onChange={e => setSubject(e.target.value)}
+            placeholder="e.g. DBMS"
+          />
+        </div>
+      </div>
+
+      <div className="formrow">
+        <div className="field">
+          <label>Deadline</label>
+          <input
+            type="datetime-local"
+            value={deadline}
+            onChange={e => setDeadline(e.target.value)}
+          />
+        </div>
+
+        <div className="field">
+          <label>Reminder before deadline</label>
+          <select
+            value={reminder}
+            onChange={e => setReminder(e.target.value)}
+          >
+            <option value="0">At deadline</option>
+            <option value="5">5 minutes</option>
+            <option value="15">15 minutes</option>
+            <option value="30">30 minutes</option>
+            <option value="60">1 hour</option>
+            <option value="1440">1 day</option>
+          </select>
+        </div>
+      </div>
+
+      <button className="primary">+ Add task</button>
+    </form>
+  );
 }
 
 function TaskRow({ task, toggleTask, deleteTask }) {
   const due = task.deadline || task.due_date;
-  return <div className="task">
-    <input type="checkbox" checked={!!task.completed} onChange={() => toggleTask(task)} />
-    <div className="taskbody">
-      <div className={task.completed ? "taskname done" : "taskname"}>{task.title}</div>
-      <div className="muted">{task.subject || "General"}{due ? ` · Due ${new Date(due).toLocaleString()}` : ""}</div>
+
+  return (
+    <div className="task">
+      <input
+        type="checkbox"
+        checked={!!task.completed}
+        onChange={() => toggleTask(task)}
+      />
+
+      <div className="taskbody">
+        <div className={task.completed ? "taskname done" : "taskname"}>
+          {task.title}
+        </div>
+
+        <div className="muted">
+          {task.subject || "General"}
+          {due ? ` · Due ${new Date(due).toLocaleString()}` : ""}
+        </div>
+      </div>
+
+      <button
+        className="danger"
+        onClick={() => deleteTask(task)}
+      >
+        Delete
+      </button>
     </div>
-    <button className="danger" onClick={() => deleteTask(task)}>Delete</button>
-  </div>;
+  );
 }
