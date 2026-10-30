@@ -549,3 +549,17 @@ textarea::placeholder {
     padding: 23px;
   }
 }
+input[type="password"],
+input[type="text"],
+input[type="email"] {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+  -webkit-text-fill-color: #111827 !important;
+  opacity: 1 !important;
+  caret-color: #111827 !important;
+}
+
+input::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
