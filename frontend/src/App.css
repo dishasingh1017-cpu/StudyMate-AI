@@ -608,3 +608,21 @@ select:focus {
   color: #594bd2;
   z-index: 5;
 }
+/* Fix Task Title and Subject text visibility */
+input:not([type="password"]),
+textarea,
+select {
+  color: #20253a !important;
+  -webkit-text-fill-color: #20253a !important;
+  background-color: #ffffff !important;
+  caret-color: #20253a !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+input:not([type="password"])::placeholder,
+textarea::placeholder {
+  color: #999999 !important;
+  -webkit-text-fill-color: #999999 !important;
+  opacity: 1 !important;
+}
