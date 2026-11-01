@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import "./App.css";
 
-const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+const API = "https://studymate-ai-wrgt.onrender.com";
 
 function readToken(data) {
   return data?.access_token || data?.token || data?.accessToken || "";
@@ -15,13 +15,21 @@ function getError(data, fallback) {
 }
 
 export default function App() {
-  const [token, setToken] = useState(() => localStorage.getItem("studysync_token") || "");
+  const [token, setToken] = useState(() => {
+    if (new URLSearchParams(window.location.search).has("reset_token")) {
+      localStorage.removeItem("studysync_token");
+      return "";
+    }
+    return localStorage.getItem("studysync_token") || "";
+  });
   const [user, setUser] = useState(null);
-  const [authMode, setAuthMode] = useState("login");
+  const [resetToken, setResetToken] = useState(() => new URLSearchParams(window.location.search).get("reset_token") || "");
+  const [authMode, setAuthMode] = useState(() => new URLSearchParams(window.location.search).has("reset_token") ? "reset" : "login");
   const [page, setPage] = useState("Dashboard");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
 
@@ -156,6 +164,69 @@ export default function App() {
       cancelled = true;
     };
   }, [token]);
+
+  async function handleForgotPassword(e) {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+    setBusy(true);
+
+    try {
+      const response = await fetch(`${API}/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim() })
+      });
+      const raw = await response.text();
+      let data = {};
+      try { data = raw ? JSON.parse(raw) : {}; } catch { data = { message: raw }; }
+      if (!response.ok) throw new Error(getError(data, `Request failed (${response.status})`));
+      setMessage(data.message || "If an account exists with this email, a reset link will be sent.");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleResetPassword(e) {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setBusy(true);
+    try {
+      const response = await fetch(`${API}/auth/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: resetToken, new_password: password })
+      });
+      const raw = await response.text();
+      let data = {};
+      try { data = raw ? JSON.parse(raw) : {}; } catch { data = { message: raw }; }
+      if (!response.ok) throw new Error(getError(data, `Request failed (${response.status})`));
+
+      setAuthMode("login");
+      setPassword("");
+      setConfirmPassword("");
+      setResetToken("");
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setMessage(data.message || "Password reset successful. Please log in.");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function handleAuth(e) {
     e.preventDefault();
@@ -404,110 +475,164 @@ export default function App() {
   }, [tasks, token]);
 
   if (!token || !user) {
+    const authTitle =
+      authMode === "forgot" ? "Forgot your password?" :
+      authMode === "reset" ? "Create a new password" :
+      authMode === "login" ? "Welcome back!" : "Create your account";
+
     return (
       <div className="auth">
         <div className="brand">✦ StudySync AI</div>
 
         <div className="card auth-card">
-          <h1>
-            {authMode === "login"
-              ? "Welcome back!"
-              : "Create your account"}
-          </h1>
-
+          <h1>{authTitle}</h1>
           <p className="muted">
-            Plan smarter. Learn consistently. Reach your goals.
+            {authMode === "forgot"
+              ? "Enter your registered email and we will send a password reset link."
+              : authMode === "reset"
+                ? "Choose a strong password for your account."
+                : "Plan smarter. Learn consistently. Reach your goals."}
           </p>
 
           {error && <div className="error">{error}</div>}
           {message && <div className="success">{message}</div>}
 
-          <form onSubmit={handleAuth}>
-            {authMode === "signup" && (
+          {authMode === "forgot" && (
+            <form onSubmit={handleForgotPassword}>
               <div className="field">
-                <label>Full name</label>
+                <label>Email address</label>
                 <input
                   required
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder="Your name"
-                  autoComplete="name"
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  autoComplete="email"
                 />
               </div>
-            )}
+              <button className="primary auth-submit" disabled={busy}>
+                {busy ? "Sending..." : "Send reset link"}
+              </button>
+            </form>
+          )}
 
-            <div className="field">
-              <label>Email address</label>
-              <input
-                required
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                autoComplete="email"
-              />
-            </div>
-
-            <div className="field">
-              <label>Password</label>
-
-              <div className="password-wrapper">
+          {authMode === "reset" && (
+            <form onSubmit={handleResetPassword}>
+              <div className="field">
+                <label>New password</label>
                 <input
                   required
-                  type={showPassword ? "text" : "password"}
-                  minLength={6}
+                  type="password"
+                  minLength={8}
+                  maxLength={128}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="Enter password"
-                  autoComplete={
-                    authMode === "login"
-                      ? "current-password"
-                      : "new-password"
-                  }
+                  placeholder="At least 8 characters"
+                  autoComplete="new-password"
                 />
-
-                <button
-                  type="button"
-                  className="toggle-password"
-                  onClick={() => setShowPassword(prev => !prev)}
-                  aria-label={
-                    showPassword ? "Hide password" : "Show password"
-                  }
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
               </div>
-            </div>
+              <div className="field">
+                <label>Confirm new password</label>
+                <input
+                  required
+                  type="password"
+                  minLength={8}
+                  maxLength={128}
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  placeholder="Enter password again"
+                  autoComplete="new-password"
+                />
+              </div>
+              <button className="primary auth-submit" disabled={busy}>
+                {busy ? "Updating..." : "Reset password"}
+              </button>
+            </form>
+          )}
 
-            <button
-              className="primary auth-submit"
-              disabled={busy}
-            >
-              {busy
-                ? "Please wait..."
-                : authMode === "login"
-                  ? "Login"
-                  : "Create account"}
-            </button>
-          </form>
+          {(authMode === "login" || authMode === "signup") && (
+            <form onSubmit={handleAuth}>
+              {authMode === "signup" && (
+                <div className="field">
+                  <label>Full name</label>
+                  <input
+                    required
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    placeholder="Your name"
+                    autoComplete="name"
+                  />
+                </div>
+              )}
+
+              <div className="field">
+                <label>Email address</label>
+                <input
+                  required
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                />
+              </div>
+
+              <div className="field">
+                <label>Password</label>
+                <div className="password-wrapper">
+                  <input
+                    required
+                    type={showPassword ? "text" : "password"}
+                    minLength={authMode === "signup" ? 8 : 1}
+                    maxLength={128}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="Enter password"
+                    autoComplete={authMode === "login" ? "current-password" : "new-password"}
+                  />
+                  <button
+                    type="button"
+                    className="toggle-password"
+                    onClick={() => setShowPassword(prev => !prev)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                </div>
+              </div>
+
+              {authMode === "login" && (
+                <p className="muted auth-switch" style={{ textAlign: "right", marginTop: "-8px" }}>
+                  <a href="#forgot" onClick={e => {
+                    e.preventDefault();
+                    setAuthMode("forgot");
+                    setError("");
+                    setMessage("");
+                    setPassword("");
+                  }}>Forgot password?</a>
+                </p>
+              )}
+
+              <button className="primary auth-submit" disabled={busy}>
+                {busy ? "Please wait..." : authMode === "login" ? "Login" : "Create account"}
+              </button>
+            </form>
+          )}
 
           <p className="muted auth-switch">
-            {authMode === "login"
-              ? "New to StudySync? "
-              : "Already have an account? "}
-
-            <a
-              href="#"
-              onClick={e => {
-                e.preventDefault();
-                setAuthMode(authMode === "login" ? "signup" : "login");
-                setError("");
-                setMessage("");
-                setPassword("");
-                setShowPassword(false);
-              }}
-            >
-              {authMode === "login" ? "Sign up" : "Login"}
+            {authMode === "login" ? "New to StudySync? " :
+             authMode === "signup" ? "Already have an account? " :
+             "Remembered your password? "}
+            <a href="#auth" onClick={e => {
+              e.preventDefault();
+              setAuthMode(authMode === "login" ? "signup" : "login");
+              setError("");
+              setMessage("");
+              setPassword("");
+              setConfirmPassword("");
+              setShowPassword(false);
+            }}>
+              {authMode === "login" ? "Sign up" : "Back to Login"}
             </a>
           </p>
         </div>
